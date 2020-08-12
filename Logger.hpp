@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <mutex>
 #include <fstream>
 
@@ -36,20 +37,68 @@ private:
     std::string getCurrentTime();
     void logToFile(std::string &text);
     void logToConsole(std:: string &text);
+    
+    template<typename T>
+    void constructMessage(std::ostringstream &os, T arg1){
+        os<<arg1;
+    }
+
+    template<typename T, typename... Args>
+    void constructMessage(std::ostringstream &os, T arg1, Args... args){
+        os<<arg1<<" : ";
+        constructMessage(os,args...);
+    }
+
+    void Error(std::string &text);
+    void Warn(std::string &text);
+    void Info(std::string &text);
+    void Trace(std::string &text);
+    void Debug(std::string &text);
 
 public:
 
     static Logger& getInstance();
-    void error(std::string &text);
-    void error(const char *text);
-    void warn(std::string &text);
-    void warn(const char *text);
-    void info(std::string &text);
-    void info(const char *text);
-    void trace(std::string &text);
-    void trace(const char *text);
-    void debug(std::string &text);
-    void debug(const char *text);
+
+    template<typename... Args>
+    void error(Args... args){
+        std::ostringstream os;
+        constructMessage(os, args...);
+        std::string text = os.str();
+        Error(text);
+    }
+
+    template<typename... Args>
+    void warn(Args... args){
+        std::ostringstream os;
+        constructMessage(os, args...);
+        std::string text = os.str();
+        Warn(text);
+    }
+
+    template<typename... Args>
+    void info(Args... args){
+        std::ostringstream os;
+        constructMessage(os, args...);
+        std::string text = os.str();
+        Info(text);
+    }
+
+    template<typename... Args>
+    void trace(Args... args){
+        std::ostringstream os;
+        constructMessage(os, args...);
+        std::string text = os.str();
+        Trace(text);
+    }
+
+    template<typename... Args>
+    void debug(Args... args){
+        std::ostringstream os;
+        constructMessage(os, args...);
+        std::string text = os.str();
+        Debug(text);
+    }
+
     void setLoggerLevel(LoggerLevel level);
     void setLoggerType(LoggerType type);
     void disableLogging();

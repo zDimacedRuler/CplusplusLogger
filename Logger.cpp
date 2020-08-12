@@ -68,7 +68,7 @@ bool Logger::isConsoleLoggingEnabled(){
     return false;
 }
 
-void Logger::error(string &text){
+void Logger::Error(string &text){
     string message;
     message.append(" [E] ");
     message.append(text);
@@ -82,12 +82,7 @@ void Logger::error(string &text){
         logToConsole(message);
 }
 
-void Logger::error(const char *text){
-    string message{text};
-    error(message);
-}
-
-void Logger::warn(string &text){
+void Logger::Warn(string &text){
     string message;
     message.append(" [W] ");
     message.append(text);
@@ -101,12 +96,7 @@ void Logger::warn(string &text){
         logToConsole(message);
 }
 
-void Logger::warn(const char *text){
-    string message{text};
-    warn(message);
-}
-
-void Logger::info(string &text){
+void Logger::Info(string &text){
     string message;
     message.append(" [I] ");
     message.append(text);
@@ -120,12 +110,7 @@ void Logger::info(string &text){
     logToConsole(message);
 }
 
-void Logger::info(const char *text){
-    string message{text};
-    info(message);
-}
-
-void Logger::trace(string &text){
+void Logger::Trace(string &text){
     string message;
     message.append(" [T] ");
     message.append(text);
@@ -139,12 +124,7 @@ void Logger::trace(string &text){
         logToConsole(message);
 }
 
-void Logger::trace(const char *text){
-    string message{text};
-    trace(message);
-}
-
-void Logger::debug(string &text){
+void Logger::Debug(string &text){
     string message;
     message.append(" [D] ");
     message.append(text);
@@ -157,9 +137,3 @@ void Logger::debug(string &text){
     if(isConsoleLoggingEnabled() && loggerLevel >= LoggerLevel::DEBUG)
         logToConsole(message);
 }
-
-void Logger::debug(const char *text){
-    string message{text};
-    debug(message);
-}
-
