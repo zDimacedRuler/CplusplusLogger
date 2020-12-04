@@ -1,14 +1,30 @@
 #include <iostream>
 #include "Logger.hpp"
 
-#define DEFAULT_LOG_FILENAME "log_messages.log"
+#define DEFAULT_LOG_FILENAME "log_messages"
+#define FILE_EXTENSION ".log"
+#define MAX_DATE 20
 
 using namespace std;
 
 Logger::Logger(){
-    loggerType = LoggerType::CONSOLE_LOG;
+    initLoggingType();
+    initLoggingLevel();
+}
+
+void Logger::initLoggingType(){
+    loggerType = LoggerType::CONSOLE_FILE_LOG;
+    if(isFileLoggingEnabled()){
+        time_t now = time(0);
+        char the_date[MAX_DATE];
+        strftime(the_date, MAX_DATE, "%Y%m%d%H%M%S", localtime(&now));
+        string filename = DEFAULT_LOG_FILENAME + string(the_date)+ FILE_EXTENSION;
+        logFile.open(filename, ios::out|ios::app);
+    }
+}
+
+void Logger::initLoggingLevel(){
     loggerLevel = LoggerLevel::INFO;
-    logFile.open(DEFAULT_LOG_FILENAME, ios::out|ios::app);
 }
 
 Logger::~Logger(){
@@ -23,12 +39,11 @@ Logger& Logger::getInstance(){
 
 string Logger::getCurrentTime(){
     string currTime;
-    time_t now = time(0); 
+    time_t now = time(0);
     currTime.assign(ctime(&now));
-
     // removing Last charactor of currentTime which is "\n"
     currTime = currTime.substr(0, currTime.size()-1);
-    return currTime;    
+    return currTime;
 }
 
 void Logger::logToFile(string &text){
@@ -44,10 +59,6 @@ void Logger::setLoggerLevel(LoggerLevel level){
     loggerLevel = level;
 }
 
-void Logger::setLoggerType(LoggerType type){
-    loggerType = type;
-}
-
 void Logger::disableLogging(){
     setLoggerLevel(LoggerLevel::DISABLE_ALL);
 }
@@ -57,22 +68,22 @@ void Logger::enableLogging(){
 }
 
 bool Logger::isFileLoggingEnabled(){
-    if(loggerType == LoggerType::CONSOLE_LOG || loggerType == LoggerType::CONSOLE_FILE_LOG)
-        return true;
-    return false;
-}
-
-bool Logger::isConsoleLoggingEnabled(){
     if(loggerType == LoggerType::FILE_LOG || loggerType == LoggerType::CONSOLE_FILE_LOG)
         return true;
     return false;
 }
 
-void Logger::Error(string &text){
+bool Logger::isConsoleLoggingEnabled(){
+    if(loggerType == LoggerType::CONSOLE_LOG || loggerType == LoggerType::CONSOLE_FILE_LOG)
+        return true;
+    return false;
+}
+
+void Logger::logError(string &text){
     string message;
     message.append(" [E] ");
     message.append(text);
-    
+
     //logging to file
     if(isFileLoggingEnabled() && loggerLevel >= LoggerLevel::ERROR)
         logToFile(message);
@@ -82,7 +93,7 @@ void Logger::Error(string &text){
         logToConsole(message);
 }
 
-void Logger::Warn(string &text){
+void Logger::logWarn(string &text){
     string message;
     message.append(" [W] ");
     message.append(text);
@@ -96,7 +107,7 @@ void Logger::Warn(string &text){
         logToConsole(message);
 }
 
-void Logger::Info(string &text){
+void Logger::logInfo(string &text){
     string message;
     message.append(" [I] ");
     message.append(text);
@@ -110,7 +121,7 @@ void Logger::Info(string &text){
     logToConsole(message);
 }
 
-void Logger::Trace(string &text){
+void Logger::logTrace(string &text){
     string message;
     message.append(" [T] ");
     message.append(text);
@@ -124,7 +135,7 @@ void Logger::Trace(string &text){
         logToConsole(message);
 }
 
-void Logger::Debug(string &text){
+void Logger::logDebug(string &text){
     string message;
     message.append(" [D] ");
     message.append(text);

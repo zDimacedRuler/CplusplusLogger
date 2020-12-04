@@ -7,6 +7,12 @@
 #include <mutex>
 #include <fstream>
 
+#define Error(args...) Logger::getInstance().error(args)
+#define Warn(args...) Logger::getInstance().warn(args)
+#define Info(args...) Logger::getInstance().info(args)
+#define Trace(args...) Logger::getInstance().trace(args)
+#define Debug(args...) Logger::getInstance().debug(args)
+
 enum class LoggerLevel{
     DISABLE_ALL = 0,
     ERROR = 1,
@@ -37,7 +43,7 @@ private:
     std::string getCurrentTime();
     void logToFile(std::string &text);
     void logToConsole(std:: string &text);
-    
+
     template<typename T>
     void constructMessage(std::ostringstream &os, T arg1){
         os<<arg1;
@@ -49,11 +55,15 @@ private:
         constructMessage(os,args...);
     }
 
-    void Error(std::string &text);
-    void Warn(std::string &text);
-    void Info(std::string &text);
-    void Trace(std::string &text);
-    void Debug(std::string &text);
+    //Logging Type Can only be changed from confg file
+    void initLoggingType();
+    void initLoggingLevel();
+
+    void logError(std::string &text);
+    void logWarn(std::string &text);
+    void logInfo(std::string &text);
+    void logTrace(std::string &text);
+    void logDebug(std::string &text);
 
 public:
 
@@ -64,7 +74,7 @@ public:
         std::ostringstream os;
         constructMessage(os, args...);
         std::string text = os.str();
-        Error(text);
+        logError(text);
     }
 
     template<typename... Args>
@@ -72,7 +82,7 @@ public:
         std::ostringstream os;
         constructMessage(os, args...);
         std::string text = os.str();
-        Warn(text);
+        logWarn(text);
     }
 
     template<typename... Args>
@@ -80,7 +90,7 @@ public:
         std::ostringstream os;
         constructMessage(os, args...);
         std::string text = os.str();
-        Info(text);
+        logInfo(text);
     }
 
     template<typename... Args>
@@ -88,7 +98,7 @@ public:
         std::ostringstream os;
         constructMessage(os, args...);
         std::string text = os.str();
-        Trace(text);
+        logTrace(text);
     }
 
     template<typename... Args>
@@ -96,11 +106,12 @@ public:
         std::ostringstream os;
         constructMessage(os, args...);
         std::string text = os.str();
-        Debug(text);
+        logDebug(text);
     }
-
+    int getLoggerLevel(){
+        return (static_cast<int>(loggerLevel));
+    };
     void setLoggerLevel(LoggerLevel level);
-    void setLoggerType(LoggerType type);
     void disableLogging();
     void enableLogging();
     bool isConsoleLoggingEnabled();
